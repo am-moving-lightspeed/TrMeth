@@ -2,13 +2,17 @@ from translator.core.lexeme import *
 from translator.core.keyword import *
 
 
+# Single
+OPERATOR_DESC = r"Operator."
+
+# ==================================================
+
+# Dictionaries
 KEYWORD_DESC_DICT = dict.fromkeys(DECLARATIONS, r"Declaration keyword.")
 KEYWORD_DESC_DICT.update(dict.fromkeys(MODIFIERS, r"Modifier keyword."))
 KEYWORD_DESC_DICT.update(dict.fromkeys(TYPES, r"Type keyword."))
 KEYWORD_DESC_DICT.update(dict.fromkeys(LOOPS, r"Loop keyword."))
 KEYWORD_DESC_DICT.update(dict.fromkeys(CONDITIONS, r"Condition keyword."))
-
-OPERATOR_DESC = r"Operator."
 
 PUNCTUATION_DESC_DICT = {
     SEMICOLON: r"Represents an end of an instruction.",
@@ -29,6 +33,6 @@ LITERAL_DESC_DICT = {
 }
 
 IDENTIFIER_DESC_DICT = {
-    'UNRESOLVED': "Unresolved identifier.",
-    'USER_DEFINED': "Identifier defined by user."
+    'UNRESOLVED': r"Unresolved symbols sequence.",
+    'USER_DEFINED': r"Identifier defined by user."
 }

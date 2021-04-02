@@ -14,10 +14,12 @@ public class Program {
 
         int tmp = N;
         int rem = 0;
+
         0.95e+05;
         0.95e-05;
-        0.0;
+        0. 0;
         "sad"s"
+
         while (tmp != 0) {
             rem = tmp % 10;
             revN = revN * 10 + rem;

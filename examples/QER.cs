@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 
 
@@ -9,6 +9,9 @@ namespace CS_tmp {
         public static void Resolve() {
 
             double A, B, C, D, r1, r2, real, imag;
+
+            |
+            "asd
 
             Console.WriteLine("Enter coefs A, B, and C: ");
             A = double.Parse(Console.ReadLine());

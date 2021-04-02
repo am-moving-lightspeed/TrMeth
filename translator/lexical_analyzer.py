@@ -1,10 +1,12 @@
 import re as regex
 from typing import List
 from typing import TextIO
-from typing import Optional
+from typing import Tuple
 
-from translator.core.desc import *
+from translator.core.lexeme import *
 from translator.core.lexeme import LexemeType as Type
+from translator.core.keyword import *
+from translator.core.desc import OPERATOR_DESC
 from translator.core.desc import PUNCTUATION_DESC_DICT as PDD
 from translator.core.desc import KEYWORD_DESC_DICT as KDD
 from translator.core.desc import LITERAL_DESC_DICT as LDD
@@ -21,7 +23,7 @@ class LexicalAnalyzer:
 
 
     @classmethod
-    def analyze(cls, file: TextIO) -> Optional[List[Lexeme]]:
+    def analyze(cls, file: TextIO) -> Tuple[List[Lexeme], List[Lexeme]]:
         #
         if len(cls._lexemes) != 0:
             cls._lexemes = []
@@ -31,10 +33,10 @@ class LexicalAnalyzer:
                 cls._current_line += 1
                 cls._resolve_line(line)
 
-            return cls._lexemes
+            return cls._lexemes, cls._unresolved_sequences
 
-        except Exception:
-            return []
+        except IOError:
+            return [], []
 
         finally:
             file.close()
@@ -66,17 +68,20 @@ class LexicalAnalyzer:
           token in CONDITIONS
         ):
             cls._add_lexeme(token, Type.KEYWORD, KDD[token])
-        elif token in OPERATOR:
+        elif token in OPERATORS:
             cls._add_lexeme(token, Type.OPERATOR, OPERATOR_DESC)
         elif token in PUNCTUATION:
             cls._add_lexeme(token, Type.PUNCTUATION, PDD[token])
         elif cls._try_resolve_literal(token):
             pass
         else:
-            identifiers: List[str] = regex.split(r"(\.)", token)
+            identifiers: List[str] = regex.split(r"(\b[A-Za-z_]\w*\b)", token)
+            identifiers = cls._remove_skippables(identifiers)
 
             for id_ in identifiers:
-                if cls._try_resolve_identifier(id_):
+                if id_ in TYPES:
+                    cls._add_lexeme(id_, Type.KEYWORD, KDD[id_])
+                elif cls._try_resolve_identifier(id_):
                     pass
                 else:
                     cls._unresolved_sequences.append(
@@ -138,22 +143,16 @@ class LexicalAnalyzer:
         size = len(tokens)
         while i < size:
             # Case when a double is represented as 1.95e+05, or 2.10E-03, or etc.
-            if (
-              (tokens[i] == ADD or tokens[i] == SUB) and
-              i - 1 >= 0 and
-              i + 1 < size
-            ):
-                tmp: str = tokens[i - 1] + tokens[i] + tokens[i + 1]
-                if regex.fullmatch(Lr.DOUBLE_LITERAL_RE, tmp):
-                    out.pop(len(out) - 1)
-                    out.append(tmp)
-                    i += 1
-                else:
-                    out.append(tokens[i])
+            if tokens[i] == ADD or tokens[i] == SUB:
+                i = cls._check_if_double_and_compose(tokens, out, i)
 
             # Case when string literal encountered.
             elif tokens[i] == DQUOTE:
-                i = cls._compose_string_from_tokens(tokens, out, i)
+                i = cls._check_if_string_and_compose(tokens, out, i)
+
+            # Case when != or == encountered.
+            elif tokens[i] == ASSIGN:
+                i = cls._check_if_assignment_operator_and_compose(tokens, out, i)
 
             # Regular.
             else:
@@ -179,7 +178,7 @@ class LexicalAnalyzer:
 
 
     @staticmethod
-    def _compose_string_from_tokens(src: List[str], dest: List[str], offset: int) -> int:
+    def _check_if_string_and_compose(src: List[str], dest: List[str], offset: int) -> int:
         #
         tmp = [src[offset]]
         offset += 1
@@ -202,5 +201,38 @@ class LexicalAnalyzer:
             offset += 1
 
         dest.append("".join(tmp))
+
+        return offset
+
+
+    @staticmethod
+    def _check_if_double_and_compose(src: List[str], dest: List[str], offset: int) -> int:
+        #
+        if offset - 1 >= 0 and offset + 1 < len(src):
+            tmp: str = src[offset - 1] + src[offset] + src[offset + 1]
+
+            if regex.fullmatch(Lr.DOUBLE_LITERAL_RE, tmp):
+                dest.pop(len(dest) - 1)
+                dest.append(tmp)
+                offset += 1
+            else:
+                dest.append(src[offset])
+
+        return offset
+
+
+    @staticmethod
+    def _check_if_assignment_operator_and_compose(src: List[str],
+                                                  dest: List[str],
+                                                  offset: int) -> int:
+        #
+        if offset - 1 >= 0:
+            tmp: str = src[offset - 1] + src[offset]
+
+            if tmp == EQUAL or tmp == UNEQUAL:
+                dest.pop(len(dest) - 1)
+                dest.append(tmp)
+            else:
+                dest.append(src[offset])
 
         return offset

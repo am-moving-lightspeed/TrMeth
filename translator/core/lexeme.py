@@ -13,7 +13,8 @@ class Lexeme:
 
     def __str__(self) -> str:
         return (
-          "%4d | %-15s | %-9s | %5d | %s" % (self.id, self.type, self.title, self.line, self.desc)
+          "%4d | %-15s | %-9s | %5d | %s" %
+          (self.id, self.type, self.title, self.line, self.desc)
         )
 
 
@@ -60,9 +61,11 @@ SUB = r"-"
 MUL = r"*"
 DIV = r"/"
 MOD = r"%"
-ASS = r"="
-EQU = r"=="
-NEQ = r"!="
+ASSIGN = r"="
+EQUAL = r"=="
+UNEQUAL = r"!="
+GREATER = r">"
+LOWER = r"<"
 
 # ==================================================
 
@@ -85,6 +88,6 @@ PUNCTUATION = {
 }
 
 # Operators set
-OPERATOR = {
-    DOT, ADD, SUB, MUL, DIV, MOD, ASS, EQU, NEQ
+OPERATORS = {
+    DOT, ADD, SUB, MUL, DIV, MOD, ASSIGN, EQUAL, UNEQUAL, GREATER, LOWER
 }
