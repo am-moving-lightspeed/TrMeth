@@ -26,29 +26,23 @@ FOR = r"for"
 IF = r"if"
 ELSE = r"else"
 
-# ==================================================
 
-# Declarations set
 DECLARATIONS = {
-    USING, CLASS
+  USING, CLASS
 }
 
-# Modifiers set
 MODIFIERS = {
-    STATIC, PUBLIC, PROTECTED, PRIVATE, INTERNAL
+  STATIC, PUBLIC, PROTECTED, PRIVATE, INTERNAL
 }
 
-# Types set
 TYPES = {
-    VOID, INT, DOUBLE, BOOL, STRING
+  VOID, INT, DOUBLE, BOOL, STRING
 }
 
-# Loops set
 LOOPS = {
-    WHILE, DO, FOR
+  WHILE, DO, FOR
 }
 
-# Conditions set
 CONDITIONS = {
-    IF, ELSE
+  IF, ELSE
 }
