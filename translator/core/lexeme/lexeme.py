@@ -7,6 +7,8 @@ __all__ = [
   'SEMICOLON_LEXEME',
   'PARENTHESIS_LEFT_LEXEME',
   'PARENTHESIS_RIGHT_LEXEME',
+  'BRACE_LEFT_LEXEME',
+  'BRACE_RIGHT_LEXEME',
   'CALL_LEXEME'
 ]
 
@@ -57,4 +59,4 @@ BRACE_RIGHT_LEXEME = Lexeme(type_ = LexemeType.PUNCTUATION,
 
 # Operators
 CALL_LEXEME = Lexeme(type_ = LexemeType.OPERATOR,
-                            title = CALL)
+                     title = CALL)

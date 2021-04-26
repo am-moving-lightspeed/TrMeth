@@ -6,8 +6,9 @@ from translator.analyzers.syntax_analyzer import SyntaxAnalyzer
 
 
 if __name__ == '__main__':
-    with open("../examples/test.cs", encoding = r'utf-8') as file:
+    with open("../examples/QER.cs", encoding = r'utf-8') as file:
         lexemes, _ = LexicalAnalyzer.analyze(file)
-        tree = SyntaxAnalyzer.parse_instruction(lexemes, 0)
+        tree = SyntaxAnalyzer.analyze(lexemes)
+        print(_)
         for pre, _, node in RenderTree(tree, style = ContStyle()):
             print("%s%s" % (pre, node.name))

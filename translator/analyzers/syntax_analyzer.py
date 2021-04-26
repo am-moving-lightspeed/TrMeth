@@ -1,45 +1,77 @@
 from typing import List
 from typing import Optional
+from typing import Tuple
 
-from anytree import Node, RenderTree
+from anytree import Node
 
 from translator.core.lexeme import *
 from translator.core.operators_priorities import Priority
 
 
 class SyntaxAnalyzer:
-    """
-    Note:
-        builds strictly binary tree.
-    """
+    #
+    EMPTY_TITLE = '$'
+    ROOT_TITLE = '$ROOT'
+    START_BLOCK_TITLE = '$BLOCK'
+    END_BLOCK_TITLE = '$ENDBLOCK'
 
-    EMPTY_NODE_NAME = '$'
+    _AST_root: Node
 
+    _lexemes_read_by_instruction_parser: int = 0
     _instruction_left_parenthesis_count: int = 0
     _instruction_right_parenthesis_count: int = 0
+    _instruction_left_brace_count: int = 0
+    _instruction_right_brace_count: int = 0
 
     _priority_manager: Priority
 
 
     @classmethod
-    def parse_instruction(cls, stream: List[Lexeme], offset: int) -> Node:
+    def analyze(cls, stream: List[Lexeme], offset: int = 0) -> Node:
         #
+        cls._analyzer_clean_up()
+        head = cls._AST_root
+
+        while offset < len(stream):
+            node, parsed_lexemes_count = cls._parse_instruction(stream, offset)
+            offset += parsed_lexemes_count
+
+            if stream[offset] == BRACE_LEFT_LEXEME:
+                cls._instruction_left_brace_count += 1
+                offset += 1
+                head = Node(cls.START_BLOCK_TITLE, parent = head)
+
+            if node.name != cls.EMPTY_TITLE:
+                node.parent = head
+
+            if stream[offset] == BRACE_RIGHT_LEXEME:
+                cls._instruction_right_brace_count += 1
+                offset += 1
+                Node(cls.END_BLOCK_TITLE, parent = head)
+                head = head.parent
+
+        return cls._AST_root
+
+
+    @classmethod
+    def _parse_instruction(cls, stream: List[Lexeme], offset: int) -> Tuple[Node, int]:
+        #
+        cls._instruction_parser_clean_up()
+
         if stream[offset] == SEMICOLON_LEXEME:
-            return Node(cls.EMPTY_NODE_NAME)
+            return Node(cls.EMPTY_TITLE), cls._lexemes_read_by_instruction_parser
 
         cls._priority_manager = Priority()
 
         tree = cls._parse_lexemes_recursively(stream, offset)
 
         if tree is None:
-            return Node(cls.EMPTY_NODE_NAME)
+            return Node(cls.EMPTY_TITLE), cls._lexemes_read_by_instruction_parser
 
         while tree.parent is not None:
             tree = tree.parent
 
-        cls._clean_up()
-
-        return tree
+        return tree, cls._lexemes_read_by_instruction_parser
 
 
     @classmethod
@@ -48,6 +80,14 @@ class SyntaxAnalyzer:
                                    offset: int,
                                    parent_node: Optional[Node] = None) -> Optional[Node]:
         #
+        if (
+          stream[offset] == BRACE_LEFT_LEXEME or
+          stream[offset] == BRACE_RIGHT_LEXEME
+        ):
+            return
+        else:
+            cls._lexemes_read_by_instruction_parser += 1
+
         if stream[offset] == SEMICOLON_LEXEME:
             return
 
@@ -94,9 +134,6 @@ class SyntaxAnalyzer:
 
         cls._parse_lexemes_recursively(stream, offset + 1, current_node)
 
-        # for pre, _, node in RenderTree(cls.tmp):
-        #     print("%s%s" % (pre, node.name))
-
         return cls._resolve_order_by_priority(current_node)
 
 
@@ -110,7 +147,7 @@ class SyntaxAnalyzer:
         ):
 
             right_child: Node = subtree.children[1]  # right child of the subtree.
-            if right_child.name != cls.EMPTY_NODE_NAME:
+            if right_child.name != cls.EMPTY_TITLE:
 
                 right_child_lexeme: Lexeme = getattr(right_child, 'lexeme')
                 if (
@@ -136,7 +173,7 @@ class SyntaxAnalyzer:
         #
         if parent_node is not None:
             if len(parent_node.children) == 0:
-                parent_node.children = [Node(cls.EMPTY_NODE_NAME), right_child_node]
+                parent_node.children = [Node(cls.EMPTY_TITLE), right_child_node]
             else:
                 left_child_node: Node = parent_node.children[0]
                 parent_node.children = [left_child_node, right_child_node]
@@ -147,7 +184,7 @@ class SyntaxAnalyzer:
         #
         right_child: Node = subtree_root.children[1]
 
-        if right_child.name != cls.EMPTY_NODE_NAME:
+        if right_child.name != cls.EMPTY_TITLE:
             subtree_parent: Node = subtree_root.parent
 
             if subtree_parent is not None:
@@ -173,7 +210,7 @@ class SyntaxAnalyzer:
         #
         node = Node(lexeme_.title)
         node.lexeme = lexeme_
-        node.children = [Node(cls.EMPTY_NODE_NAME), Node(cls.EMPTY_NODE_NAME)]
+        node.children = [Node(cls.EMPTY_TITLE), Node(cls.EMPTY_TITLE)]
 
         if lexeme_.type == LexemeType.OPERATOR:
             node.priority = cls._priority_manager[node.name]
@@ -184,7 +221,16 @@ class SyntaxAnalyzer:
 
 
     @classmethod
-    def _clean_up(cls) -> None:
+    def _analyzer_clean_up(cls) -> None:
         #
+        cls._AST_root = Node(cls.ROOT_TITLE)
+        cls._instruction_left_brace_count = 0
+        cls._instruction_right_brace_count = 0
+
+
+    @classmethod
+    def _instruction_parser_clean_up(cls) -> None:
+        #
+        cls._lexemes_read_by_instruction_parser = 0
         cls._instruction_left_parenthesis_count = 0
         cls._instruction_right_parenthesis_count = 0

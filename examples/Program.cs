@@ -4,7 +4,7 @@ using System.Boob;
 
 public class Program {
 
-    public static void Main(string[] args) {
+    public static void Main() {
 
         int N;
         int revN = 0;
