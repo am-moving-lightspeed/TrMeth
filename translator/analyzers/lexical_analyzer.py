@@ -3,8 +3,10 @@ from typing import List
 from typing import TextIO
 from typing import Tuple
 
-from translator.core.lexeme import *
-from translator.core.lexeme_type import LexemeType as Type
+from translator.core.dictionary import *
+from translator.core.lexeme.lexeme import Lexeme
+from translator.core.lexeme.lexeme_type import LexemeType
+from translator.core.lexeme.lexeme_type import LexemeType as Type
 from translator.core.dictionary.keywords import *
 from translator.core.desc import OPERATOR_DESC
 from translator.core.desc import PUNCTUATION_DESC_DICT as PDD

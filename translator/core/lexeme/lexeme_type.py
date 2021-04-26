@@ -1,6 +1,11 @@
 import enum
 
 
+__all__ = [
+  'LexemeType'
+]
+
+
 class LexemeType(enum.Enum):
     #
     INVALID = -1

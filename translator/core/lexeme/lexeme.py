@@ -1,5 +1,14 @@
-from .dictionary import *
+from translator.core.dictionary import *
 from .lexeme_type import LexemeType
+
+
+__all__ = [
+  'Lexeme',
+  'SEMICOLON_LEXEME',
+  'PARENTHESIS_LEFT_LEXEME',
+  'PARENTHESIS_RIGHT_LEXEME',
+  'CALL_LEXEME'
+]
 
 
 class Lexeme:
@@ -30,11 +39,22 @@ class Lexeme:
         )
 
 
-LEXEME_SEMICOLON = Lexeme(type_ = LexemeType.PUNCTUATION,
+# Punctuation
+SEMICOLON_LEXEME = Lexeme(type_ = LexemeType.PUNCTUATION,
                           title = SEMICOLON)
 
-LEXEME_BRACE_LEFT = Lexeme(type_ = LexemeType.PUNCTUATION,
+PARENTHESIS_LEFT_LEXEME = Lexeme(type_ = LexemeType.PUNCTUATION,
+                                 title = PARENTHESIS_LEFT)
+
+PARENTHESIS_RIGHT_LEXEME = Lexeme(type_ = LexemeType.PUNCTUATION,
+                                  title = PARENTHESIS_RIGHT)
+
+BRACE_LEFT_LEXEME = Lexeme(type_ = LexemeType.PUNCTUATION,
                            title = BRACE_LEFT)
 
-LEXEME_BRACE_RIGHT = Lexeme(type_ = LexemeType.PUNCTUATION,
+BRACE_RIGHT_LEXEME = Lexeme(type_ = LexemeType.PUNCTUATION,
                             title = BRACE_RIGHT)
+
+# Operators
+CALL_LEXEME = Lexeme(type_ = LexemeType.OPERATOR,
+                            title = CALL)

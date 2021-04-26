@@ -6,7 +6,7 @@ namespace CS_tmp {
 
     class QER {
 
-        public static void Resolve() {
+        public static void Main() {
 
             double A, B, C, D, r1, r2, real, imag;
 
