@@ -35,7 +35,7 @@ class Priority:
       COMMA:     100,
 
       # Keyword
-      'KEYWORD': 200  # Same as ASSIGN.
+      'KEYWORD': 50  # Same as ASSIGN.
     }
 
     # Only used to increase priority of the operator, if it is located between parentheses.

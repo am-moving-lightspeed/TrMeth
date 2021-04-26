@@ -36,7 +36,7 @@ class SyntaxAnalyzer:
             node, parsed_lexemes_count = cls._parse_instruction(stream, offset)
             offset += parsed_lexemes_count
 
-            if stream[offset] == BRACE_LEFT_LEXEME:
+            if offset < len(stream) and stream[offset] == BRACE_LEFT_LEXEME:
                 cls._instruction_left_brace_count += 1
                 offset += 1
                 head = Node(cls.START_BLOCK_TITLE, parent = head)
@@ -44,7 +44,7 @@ class SyntaxAnalyzer:
             if node.name != cls.EMPTY_TITLE:
                 node.parent = head
 
-            if stream[offset] == BRACE_RIGHT_LEXEME:
+            if offset < len(stream) and stream[offset] == BRACE_RIGHT_LEXEME:
                 cls._instruction_right_brace_count += 1
                 offset += 1
                 Node(cls.END_BLOCK_TITLE, parent = head)
